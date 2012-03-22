@@ -3,7 +3,7 @@ package cscie160.hw4;
 /**
  * Account class for the ATM homework assignment
  * 
- * @author Larry
+ * @author Larry Tambascio
  * @version 1.0
  */
 public class Account

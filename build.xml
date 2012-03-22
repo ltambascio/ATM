@@ -5,8 +5,11 @@
     </description>
   <!-- set global properties for this build -->
   <property name="src" location="src"/>
+  <property name="test" location="test"/>
   <property name="build" location="build"/>
-  <property name="dist"  location="dist"/>
+  <property name="dist" location="dist"/>
+  <property name="lib" location="lib"/>
+  <property name="apidocs" location="apidocs"/>
 
   <target name="init">
     <!-- Create the time stamp -->
@@ -18,7 +21,18 @@
   <target name="compile" depends="init"
         description="compile the source " >
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}"/>
+    <javac destdir="${build}" classpath="${lib}/junit-4.1.jar" 
+    		includeantruntime="false">
+    	<src path="${src}"/>
+    	<src path="${test}"/>
+    </javac>
+    
+    <javadoc destdir="${apidocs}" author="true" version="true" 
+    		windowtitle="CSCIE160 HW4 ATM">
+    	<sourcepath>
+    		<pathelement location="${src}"/>
+    	</sourcepath>
+    </javadoc>
   </target>
 
   <target name="dist" depends="compile"
@@ -27,7 +41,28 @@
     <mkdir dir="${dist}/lib"/>
 
     <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}"/>
+    <jar jarfile="${dist}/lib/HW4.jar" basedir="${build}"/>
+  </target>
+  
+  <target name="test" depends="dist"
+  		description="Run the JUnit tests">
+  	<!-- Start the server process, spawning into a separate process -->
+  	<java classname="cscie160.hw4.Server" fork="true" spawn="true"
+  			classpath="${dist}/lib/HW4.jar">
+  		<arg value="7777"/>
+  	</java>
+  	
+  	<mkdir dir="${build}/reports"/>
+  	<junit printsummary="yes" showoutput="yes">
+  		<classpath>
+  			<pathelement location="${lib}/junit-4.1.jar"/>
+  			<pathelement location="${dist}/lib/HW4.jar"/>
+  		</classpath>
+  		<formatter type="plain"/>
+  		<batchtest toDir="${build}/reports">
+  			<fileset dir="${test}"/>
+  		</batchtest>
+  	</junit>
   </target>
 
   <target name="clean"
@@ -35,5 +70,6 @@
     <!-- Delete the ${build} and ${dist} directory trees -->
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
+    <delete dir="${apidocs}"/>
   </target>
 </project>

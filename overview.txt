@@ -1,0 +1,124 @@
+HW4 Design:
+
+Overview:
+	The objective of this assignment was to create a simple ATM back end
+implementation that has simply one account.  The goal was to start using basic
+network calls and to write JUnit test cases along with an Ant script that 
+built everything.
+
+Class:	cscie160.hw4.Account
+	This class is a simple bean with one property, balance.  It has a get and 
+set method for balance, as well as a customized toString method.
+
+
+Class:	cscie160.hw4.ATMImplementation
+	This class implements the ATM interface on the server side.  It has one 
+account it manages at this point in time to perform operations upon (e.g. 
+deposit, withdraw).
+
+Method:	Constructor
+	This method initializes the account class that all the other methods will
+operate on.
+
+Method:	deposit
+	An amount to deposit is passed to this method.  It gets the account's 
+current balance, adds the deposited amount to that balance, and then updates the
+balance to the new amount.
+
+Method: withdraw
+	A withdrawal amount is passed to this method.  It gets the account's 
+current balance, deducts the passed in amount, and then updates the balance to
+the new amount.
+
+Method:	getBalance
+	This method simply returns the current balance of the account.
+
+
+Class:	cscie160.hw4.Server
+	This class needed a minor change from what was distributed to use the 
+ATMImplementation class I developed.  The constructor for this class now uses
+the actual ATMImplementation class instead of the anonymous no-op implementation
+of the ATM interface.
+
+
+Class:	AccountTest
+	This class has two test methods that test getting the balance and setting 
+the balance.
+
+Method:	testGetBalance
+	This method first validates that it initially gets the correct initial 
+balance of zero.  The balance is then updated to a different known value, and
+then we validate that getBalance returns that known value.
+
+Method:	testSetBalance
+	This method sets the balance to a known value, and then uses getBalance to
+validate that it was set correctly.
+
+
+Class:	cscie160.hw4.ATMImplementationTest
+	This test class validates the deposit and withdraw functions while using the
+get balance function in the process.
+
+Method:	setUp
+	This method creates the instance of the ATMImplementation class that will be
+tested.
+
+Method:	testDeposit
+	This method makes two deposits to the account and validates the balance 
+after each one.  After the second deposit, the balance should be the sum of 
+both deposits.
+
+Method:	testWithdraw
+	This method first deposits $600, and validates that the balance only has the
+$600 deposited.  It then makes two withdrawals ensuring the correct balance 
+remains after each one.
+
+
+Class:	cscie160.hw4.ATMProxyTest
+	This test class requires that the server process be running because it calls
+the actual ATMProxy class that expects to make calls across the network to 
+perform it's operations.  Since we need to use one instance of the ATM proxy 
+class across all the test methods, we need to make it static.  Since the tests
+will be done against a static instance, this breaks the independence of each
+test method.  They are expected to be run in a particular order that was 
+observed.
+
+Method:	setUp
+	This method has uses @BeforeClass annotation so that it is only called once
+to initialize the ATMProxy instance, which is defined as a static member.  It 
+initializes the proxy to call the server instance on the localhost on port 7777.
+
+Method:	testDeposit
+	This method makes a single initial deposit, which is validated using the 
+getBalance method.  It is expected to be called first.
+
+Method:	testWithraw
+	This method makes a single withdrawal from the account, validating the 
+balance afterward.  It is expected to be the second method.
+
+Method:	testGetBalance
+	This method first validates the current balance left over from the two 
+previous test methods, and it then makes one deposit and one withdrawal, 
+validating the balance after each operation.
+
+
+Build file:
+	The build.xml file has five targets (clean, init, compile, dist, and test).
+The test source files, while in the same packages as the main source files, have
+a different directory.  The clean target deletes the build, dist, and apidocs
+directories.  The init target creates the build directory.  The compile target 
+compiles both the main source and test source directories and then it creates 
+Javadocs for the main classes.  The dist target creates a jar file for the 
+classes compiled.  The test target runs the test classes.  It does this by 
+spawning off a forked process for the server, and then runs all the classes in 
+a batch.
+
+
+Submission Notes:
+	To demonstrate the ant build script, only the source code, the JUnit jar 
+file, the build.xml file, and this overview are included in the zipped 
+submission.  From the main directory run "ant test" to execute the full build 
+script, including running the JUnit tests.  To run the server and client from
+the command line, the classpath of ".\dist\lib\HW4.jar" (for Windows) should be 
+included with the java command.  To run the JUnit tests from the command line,
+add the junit-4.1.jar in the lib directory to the classpath.
