@@ -1,4 +1,4 @@
-package cscie160.hw4;
+package cscie160.hw6;
 
 import static org.junit.Assert.assertEquals;
 

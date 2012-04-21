@@ -1,4 +1,4 @@
-package cscie160.hw4;
+package cscie160.hw6;
 
 /**
  * Server side implementation of the ATM.  This class will receive requests and
