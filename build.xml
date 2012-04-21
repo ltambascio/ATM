@@ -47,16 +47,16 @@
   <target name="test" depends="dist"
   		description="Run the JUnit tests">
   	<!-- Start the server process, spawning into a separate process -->
-  	<java classname="cscie160.hw4.Server" fork="true" spawn="true"
+  	<java classname="cscie160.hw6.Server" fork="true" spawn="true"
   			classpath="${dist}/lib/HW6.jar">
   		<arg value="7777"/>
   	</java>
   	
   	<mkdir dir="${build}/reports"/>
-  	<junit printsummary="yes" showoutput="yes">
+  	<junit printsummary="yes" showoutput="yes" haltonfailure="true">
   		<classpath>
   			<pathelement location="${lib}/junit-4.1.jar"/>
-  			<pathelement location="${dist}/lib/HW4.jar"/>
+  			<pathelement location="${dist}/lib/HW6.jar"/>
   		</classpath>
   		<formatter type="plain"/>
   		<batchtest toDir="${build}/reports">
