@@ -4,7 +4,7 @@ package cscie160.hw6;
  * Account class for the ATM homework assignment
  * 
  * @author Larry Tambascio
- * @version 1.0
+ * @version 1.1
  */
 public class Account
 {
@@ -13,7 +13,7 @@ public class Account
 	/**
 	 * @return the balance
 	 */
-	public float getBalance()
+	public synchronized float getBalance()
 	{
 		return balance;
 	}
@@ -21,7 +21,7 @@ public class Account
 	/**
 	 * @param balance the balance to set
 	 */
-	public void setBalance(float balance)
+	public synchronized void setBalance(float balance)
 	{
 		this.balance = balance;
 	}

@@ -3,20 +3,49 @@ package cscie160.hw6;
 import java.net.*;
 import java.io.*;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
+/**
+ * Server class for the multithreaded ATM (Homework 6).  Based on the provided
+ * HW4 Server class, and enhanced for multithreading.
+ * 
+ * @author	Charlie Sawyer
+ * @author	Larry Tambascio
+ * @version	1.1
+ */
 public class Server 
 {
+	private Vector<Thread>	threads;
+	
+	private Vector<ATMRunnable>	requests;
 	
     private ServerSocket serverSocket;
+    
     private ATM atmImplementation;
+    
     private BufferedReader bufferedReader;
-    public Server(int port) throws java.io.IOException 
+    
+    /**
+     * Constructor that takes a port number for initializing the ServerSocket.
+     * 
+     * @param	port	Port number to listen on
+     * @throws	IOException	Potentially thrown by creating the ServerSocket. 
+     */
+    public Server(int port) throws IOException 
 	{
 		serverSocket = new ServerSocket(port);
-		// Anonymous no-op implementation of interface ATM as place-holder
-		// here.  Replace it with a real ATMImplementation that holds an
-		// Account object and manages it.
-		atmImplementation = new ATMImplementation(); 
+		
+		atmImplementation = new ATMImplementation();
+		
+		requests = new Vector<ATMRunnable>(5);
+		
+		threads = new Vector<Thread>(5);
+		for (int i = 0; i < 5; i++)
+		{
+			Thread thread = new Thread(new ATMThread(requests));
+			threads.add(thread);
+			thread.start();
+		}
     }
 	
     /** serviceClient accepts a client connection and reads lines from the socket.
@@ -42,19 +71,25 @@ public class Server
 			String commandLine;
 			while ((commandLine = bufferedReader.readLine()) != null) 
 			{
-				try 
+				ATMRunnable command = new ATMRunnable(commandLine, atmImplementation, printStream);
+				synchronized (requests)
 				{
-					Float result = executeCommand(commandLine);
-					// Only BALANCE command returns non-null
-					if (result != null) 
-					{ 
-						printStream.println(result);  // Write it back to the client
-					}
-				} 
-				catch (ATMException atmex) 
-				{
-					System.out.println("ERROR: " + atmex);
-				} 
+					requests.add(command);
+					requests.notify();
+				}
+//				try 
+//				{
+//					Float result = executeCommand(commandLine);
+//					// Only BALANCE command returns non-null
+//					if (result != null) 
+//					{ 
+//						printStream.println(result);  // Write it back to the client
+//					}
+//				} 
+//				catch (ATMException atmex) 
+//				{
+//					System.out.println("ERROR: " + atmex);
+//				} 
 				
 			}
 		}

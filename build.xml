@@ -21,14 +21,14 @@
   <target name="compile" depends="init"
         description="compile the source " >
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac destdir="${build}" classpath="${lib}/junit-4.1.jar" 
-    		includeantruntime="false">
+    <javac destdir="${build}" classpath="${lib}/junit-4.1.jar;${lib}/log4j-1.2.16.jar" 
+    		includeantruntime="false" debug="on">
     	<src path="${src}"/>
     	<src path="${test}"/>
     </javac>
     
     <javadoc destdir="${apidocs}" author="true" version="true" 
-    		windowtitle="CSCIE160 HW4 ATM">
+    		windowtitle="CSCIE160 HW4 ATM" classpath="${lib}/junit-4.1.jar;${lib}/log4j-1.2.16.jar">
     	<sourcepath>
     		<pathelement location="${src}"/>
     	</sourcepath>
@@ -37,6 +37,7 @@
 
   <target name="dist" depends="compile"
         description="generate the distribution" >
+  	<copy file="log4j.properties" todir="${build}" />
     <!-- Create the distribution directory -->
     <mkdir dir="${dist}/lib"/>
 
@@ -48,7 +49,7 @@
   		description="Run the JUnit tests">
   	<!-- Start the server process, spawning into a separate process -->
   	<java classname="cscie160.hw6.Server" fork="true" spawn="true"
-  			classpath="${dist}/lib/HW6.jar">
+  			classpath="${dist}/lib/HW6.jar;${lib}/log4j-1.2.16.jar">
   		<arg value="7777"/>
   	</java>
   	
