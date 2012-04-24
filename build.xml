@@ -44,15 +44,25 @@
     <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
     <jar jarfile="${dist}/lib/HW6.jar" basedir="${build}"/>
   </target>
-  
-  <target name="test" depends="dist"
-  		description="Run the JUnit tests">
+
+  <target name="demo" depends="dist" 
+  		description="Start up the server and run the client">
   	<!-- Start the server process, spawning into a separate process -->
   	<java classname="cscie160.hw6.Server" fork="true" spawn="true"
   			classpath="${dist}/lib/HW6.jar;${lib}/log4j-1.2.16.jar">
   		<arg value="7777"/>
   	</java>
   	
+  	<java classname="cscie160.hw6.Client" 
+  			classpath="${dist}/lib/HW6.jar;${lib}/log4j-1.2.16.jar">
+  		<arg value="localhost"/>
+  		<arg value="7777"/>
+  	</java>
+  </target>
+	
+  <target name="test" depends="dist"
+  		description="Run the JUnit tests">
+
   	<mkdir dir="${build}/reports"/>
   	<junit printsummary="yes" showoutput="yes" haltonfailure="true">
   		<classpath>

@@ -1,3 +1,99 @@
+HW6 Design:
+
+Overview:
+	The objective of this assignment was to incorporate multithreading to the
+socket based ATM of homework assignment 4.  This would allow for potentially 
+greater throughput and increased (faster) response time.  The design calls for 
+a thread pool where individual threads are activated when a request arrives on 
+the socket.  The server process creates a "work order" runnable object, places 
+it on the request queue, and then notifies the thread pool objects that a new
+request is waiting for them.  A thread pool object will then wake up, create a
+new thread to process the transaction, and then return to waiting for the next
+request to show up.
+
+	Some logic had to be moved from the Server class to the ATMRunnable class 
+since it will actually be processing the transaction, not the Server class.
+
+
+Submission notes:
+	The ATMProxyTest class was removed from this version of the application 
+since it was not able to get reliable results since it was testing the server
+which now handles things in threads which will yield inconsistent results.
+
+	The build script now has a demo target which forks a thread or the server 
+process.  You'll see the client side output in the ant output.  To see the 
+server output, you'll need to start the server process up manually.  The 
+classpath for both the server and the client processes should be 
+"dist\lib\HW6.jar;lib\log4j-1.2.16.jar" if you're running it from the project 
+root directory.  You will need to at least execute the "dest" target in order to
+run the server and client.
+
+
+Class:	cscie160.hw6.Account
+	Since this class will be called from multiple threads simultaneously, the 
+methods need to be synchronized.  Both the getBalance and setBalance methods 
+have had the synchronized keyword added to their declarations.  No other changes
+were needed for this class.
+
+
+Class:	cscie160.hw6.Server
+	This class needed many changes.  It's primary responsibility now is to 
+service client requests and add them to the request queue.  To do that it will 
+need to create a small pool of threads and a request "queue" as part of the 
+constructor.
+
+Method: serviceClient
+	As the server reads requests, it will create an ATMRunnable object, add it 
+to the request queue (vector), and notify the waiting ATMThread objects that 
+there is a new request waiting to be processed.  It will process all the 
+requests it can, and then wait for the next socket connection.  This will allow
+the server to process the client more than one time without having to be 
+restarted.  This was not intended to handle multiple clients simultaneously, but
+was intended to allow the client process to be run multiple times against the 
+one server process.  As written in homework 4, the server needs to be restarted
+each time the client is run.
+
+Method:	executeCommand
+	This method has been removed from this class and the logic has been added 
+to the run method of the ATMRunnable class.
+
+
+Class:	cscie160.hw6.ATMRunnable
+	This class is designed to run each transaction in it's own thread.  It has
+references to the command line to execute, the remote ATM reference, and the
+print stream for the response to the client.
+
+Method:	run
+	This method essentially does what the old executeCommand method in the 
+Server class did, and it is largely based on it.  The executeCommand method 
+return a Float object, took the command line string as a parameter, and declared
+ATMException as thrown.  The command line string is passed to the AMTRunnable 
+object when it is created, but the run method can neither return a value to the 
+caller nor throw an ATMException.  It will use the passed in print stream to 
+return the balance value for that command to the caller, and it now handles the
+exceptions itself.
+
+
+Class:	cscie160.hw6.ATMThread
+	This class is the thread pool class.  It is given a reference to the 
+requests object that it will monitor.
+
+Method:	Constructor
+	The constructor receives a reference to the requests queue/object (it is 
+actually a Vector<ATMRunnable>).
+
+Method:	run
+	This method loops infinitely to continuously process requests.  Once it has 
+processed one request, it will loop around and wait on the requests object 
+again.  When it is notified there is a request object to process, it tries to 
+get the request object off of the queue.  The assumption is that it will get and
+remove the first element in the vector.  Once it has the request object, which
+itself implements Runnable, a new Thread is created with the request object, and 
+it is started.  After that, it will loop around to wait again for the next 
+request.
+
+
+--------------------------------------------------------------------------------
 HW4 Design:
 
 Overview:

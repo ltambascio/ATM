@@ -6,7 +6,7 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 
 /**
- * Executes client requests.
+ * Executes client requests, this class is the "work-order" request object.
  * 
  * @author	Larry Tambascio
  * @version	1.0
@@ -15,12 +15,28 @@ public class ATMRunnable implements Runnable
 {
     Logger log = Logger.getLogger(ATMRunnable.class);
     
+    /**
+     * Remote reference to ATM
+     */
 	private ATM	atmImplementation;
     
+	/**
+	 * Command line to execute
+	 */
     private String commandLine;
     
+    /**
+     * Reference to client to write the response to
+     */
     private PrintStream output;
     
+    /**
+     * Constructor.
+     * 
+     * @param commandLine	Command line to execute
+     * @param atmRemote		Remote reference to ATM
+     * @param output		Output stream to write response back to
+     */
 	public ATMRunnable(String commandLine, ATM atmRemote, PrintStream output)
 	{
 		this.commandLine = commandLine;
